@@ -19,7 +19,7 @@ export class InteresseComponent implements OnInit {
   selecionados = [];
   interesses = [];
 
-  jaTemInteresse: boolean;
+  jaTemInteresse: boolean = true;
 
   constructor(private interesseService: InteresseService, private pessoaService: PessoaService) {
     this.pessoaService.getPessoaByEmail(localStorage.getItem("email")).subscribe(
@@ -53,6 +53,19 @@ export class InteresseComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.pessoaService.getPessoaByEmail(localStorage.getItem("email")).subscribe(
+      data => {
+        this.pessoa = data;
+        this.selecionados = data.interesses.split(",")
+        if (data.interesses == "" || data.interesses == null) {
+          this.jaTemInteresse = true;
+        } else {
+          this.jaTemInteresse = false;
+          this.interesses = this.pessoa.interesses.split(",");
+        }
+      }
+    )
+    console.log(this.jaTemInteresse);
   }
 
   adicionar(i: any) {
@@ -64,6 +77,9 @@ export class InteresseComponent implements OnInit {
     this.pessoa.interesses = this.selecionados.toString();
     this.pessoaService.updatePessoa(this.pessoa).subscribe();
     this.glossarios.splice(this.glossarios.indexOf(i),1);
+
+    this.jaTemInteresse = false;
+    console.log(this.jaTemInteresse);
   }
 
   remover(i: any) {
